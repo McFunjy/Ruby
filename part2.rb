@@ -43,12 +43,6 @@ class Route
     @stations.delete(station)
   end
 
-  def get_stations
-    puts @first_stat
-    puts @stations
-    puts @last_stat
-  end
-
 end
 
 class Train
@@ -98,8 +92,16 @@ class Train
 
   def current_stat
     curr_stat = @route.stations.find {|station| station.trains.include? self}
-    num_stat = @route.stations.index(curr_stat)
-    return @route.stations[num_stat-1], @route.stations[num_stat], @route.stations[num_stat+1]
+    @num_stat = @route.stations.index(curr_stat)
+    return curr_stat
+  end
+
+  def prev_stat
+    return @route.stations[@num_stat-1]
+  end
+
+  def next_stat
+    return @route.stations[@num_stat+1]
   end
 
 end
