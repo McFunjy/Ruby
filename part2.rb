@@ -8,21 +8,20 @@ class Station
   end
 
   def add_train(train)
-    self.trains << train  
+    @trains << train
   end
 
   def freight_trains
-    self.trains.select {|train| train.type.include? "freight"}
+    @trains.select { |train| train.type.include? 'freight' }
   end
 
   def passenger_trains
-    self.trains.select {|train| train.type.include? "passenger"}
+    @trains.select { |train| train.type.include? 'passenger' }
   end
 
   def send_train(train)
-    self.trains.delete(train)
+    @trains.delete(train)
   end
-
 end
 
 class Route
@@ -42,7 +41,6 @@ class Route
   def del_station(station)
     @stations.delete(station)
   end
-
 end
 
 class Train
@@ -56,52 +54,69 @@ class Train
   end
 
   def stop
-    self.speed = 0
+    @speed = 0
   end
 
   def add_van
-    if self.speed == 0
-      @num_van += 1
-    end
+    @num_van += 1 if @speed.zero?
   end
 
   def del_van
-    if self.speed == 0
-      @num_van -= 1
-    end
+    @num_van -= 1 if @speed.zero?
   end
 
-  def set_route(route)
+  def add_route(route)
     @route = route
     @route.first_stat.add_train(self)
   end
 
+  def current_stat
+    return @route.first_stat if @route.first_stat.trains.include? self
+
+    return @route.last_stat if @route.last_stat.trains.include? self
+
+    @route.stations.find { |station| station.trains.include? self }
+  end
+
   def forward
-    curr_stat = @route.stations.find {|station| station.trains.include? self}
-    curr_stat.trains.delete(self)
-    num_stat = @route.stations.index(curr_stat)
-    @route.stations[num_stat+1].trains << self
+    return if current_stat == @route.last_stat
+
+    current_stat.trains.delete(self)
+    return @route.last_stat.trains << self if current_stat == @route.stations.last
+
+    return @route.stations.first.trains << self if current_stat == @route.first_stat
+
+    @route.stations[@route.stations.index(current_stat) + 1].trains << self
   end
 
   def backward
-    curr_stat = @route.stations.find {|station| station.trains.include? self}
-    curr_stat.trains.delete(self)
-    num_stat = @route.stations.index(curr_stat)
-    @route.stations[num_stat-1].trains << self
-  end
+    return if current_stat == @route.first_stat
 
-  def current_stat
-    curr_stat = @route.stations.find {|station| station.trains.include? self}
-    @num_stat = @route.stations.index(curr_stat)
-    return curr_stat
+    current_stat.trains.delete(self)
+    return @route.first_stat.trains << self if current_stat == @route.stations.first
+
+    return @route.stations.last.trains << self if current_stat == @route.last_stat
+
+    @route.stations[@route.stations.index(current_stat) - 1].trains << self
   end
 
   def prev_stat
-    return @route.stations[@num_stat-1]
+    return if current_stat == @route.first_stat
+
+    return @route.first_stat if current_stat == @route.stations.first
+
+    return @route.stations.last if current_stat == @route.last_stat
+
+    @route.stations[@route.stations.index(current_stat) - 1]
   end
 
   def next_stat
-    return @route.stations[@num_stat+1]
-  end
+    return if current_stat == @route.last_stat
 
+    return @route.last_stat if current_stat == @route.stations.last
+
+    return @route.stations.first if current_stat == @route.first_stat
+
+    @route.stations[@route.stations.index(current_stat) + 1]
+  end
 end
