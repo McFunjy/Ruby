@@ -79,25 +79,17 @@ class Train
   end
 
   def forward
-    return if current_stat == @route.last_stat
+    return unless destination = next_stat
 
     current_stat.trains.delete(self)
-    return @route.last_stat.trains << self if current_stat == @route.stations.last
-
-    return @route.stations.first.trains << self if current_stat == @route.first_stat
-
-    @route.stations[@route.stations.index(current_stat) + 1].trains << self
+    destination.trains << self
   end
 
   def backward
-    return if current_stat == @route.first_stat
+    return unless destination = prev_stat
 
     current_stat.trains.delete(self)
-    return @route.first_stat.trains << self if current_stat == @route.stations.first
-
-    return @route.stations.last.trains << self if current_stat == @route.last_stat
-
-    @route.stations[@route.stations.index(current_stat) - 1].trains << self
+    destination.trains << self
   end
 
   def prev_stat
