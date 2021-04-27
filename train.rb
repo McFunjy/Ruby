@@ -1,5 +1,4 @@
 class Train
-
   # Клиентский код может просматривать номер, скорость и список вагонов поезда
   attr_reader :number, :speed, :wagons
 
@@ -16,6 +15,8 @@ class Train
 
   # Метод входит в интерфейс
   def add_wagon(wagon)
+    return unless @type == wagon.type
+
     @wagons << wagon if @speed.zero?
   end
 

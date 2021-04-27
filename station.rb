@@ -1,5 +1,4 @@
 class Station
-
   # Клиентский код может просматривать список поездов на станции и названия станций
   attr_reader :name, :trains
 
@@ -13,7 +12,7 @@ class Station
   def cargo_trains
     @trains.select { |train| train.type.include? 'cargo' }
   end
-  
+
   # Клиентский код может просматривать список пассажирских поездов
   def passenger_trains
     @trains.select { |train| train.type.include? 'passenger' }

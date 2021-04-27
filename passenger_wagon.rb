@@ -1,6 +1,6 @@
 class PassengerWagon
   # Создание объекта входит в интерфейс
   def initialize
-  @type = 'passenger'
+    @type = 'passenger'
   end
 end

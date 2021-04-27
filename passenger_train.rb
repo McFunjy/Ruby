@@ -3,9 +3,4 @@ class PassengerTrain < Train
     super
     @type = 'passenger'
   end
-
-  def add_wagon(wagon)
-    return unless wagon.type == 'passenger'
-      super
-    end
 end
