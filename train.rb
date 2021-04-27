@@ -5,6 +5,7 @@ class Train
   # Клиентский код может создавать опезда
   def initialize(number)
     @number = number
+    @speed = 0
     @wagons = []
   end
 
@@ -44,7 +45,7 @@ class Train
   def forward
     return unless destination = next_stat
 
-    current_stat.trains.delete(self)
+    current_stat.send_train(self)
     destination.trains << self
   end
 
@@ -52,7 +53,7 @@ class Train
   def backward
     return unless destination = prev_stat
 
-    current_stat.trains.delete(self)
+    current_stat.send_train(self)
     destination.trains << self
   end
 

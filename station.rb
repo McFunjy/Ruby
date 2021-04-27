@@ -18,18 +18,18 @@ class Station
     @trains.select { |train| train.type.include? 'passenger' }
   end
 
-  private
-
-  # Клиентский код не должен сам добавлять или удалять поезда из списка
-  attr_writer :trains
-
-  # Метод является внутренним и не входит в интерфейс
+  # Метод используется другим классом
   def add_train(train)
     @trains << train
   end
 
-  # Метод является внутренним и не входит в интерфейс
+  # Метод используется другим классом
   def send_train(train)
     @trains.delete(train)
   end
+
+  private
+
+  # Клиентский код не должен сам добавлять или удалять поезда из списка
+  attr_writer :trains
 end
