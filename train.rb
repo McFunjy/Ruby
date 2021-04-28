@@ -46,7 +46,7 @@ class Train
     return unless destination = next_stat
 
     current_stat.send_train(self)
-    destination.trains << self
+    destination.add_train(self)
   end
 
   # Метод входит в интерфейс
@@ -54,7 +54,7 @@ class Train
     return unless destination = prev_stat
 
     current_stat.send_train(self)
-    destination.trains << self
+    destination.add_train(self)
   end
 
   # Клиентский код может возвращать предыдущую станцию
