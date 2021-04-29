@@ -7,12 +7,18 @@ require_relative 'station'
 require_relative 'train'
 
 class RailRoad
-  attr_reader :r, :s1, :s2, :t, :w
+  attr_reader :r, :s, :t
+
+  def initialize
+    @r = []
+    @s = []
+    @t = []
+  end
 
   def menu
     n = nil
     while n != 0
-      puts 'Введите 1, если хотите создать станцию, поезд, вагон или маршрут'
+      puts 'Введите 1, если хотите создать станцию, поезд или маршрут'
       puts 'Введите 2, если хотите произвести операции с созданными объектами'
       puts 'Введите 3, если хотите вывести текущие данные об объектах'
       puts 'Введите 0, если хотите закончить программу'
@@ -32,34 +38,29 @@ class RailRoad
     puts 'Введите 1, если хотите создать маршрут'
     puts 'Введите 2, если хотите создать станцию'
     puts 'Введите 3, если хотите создать поезд'
-    puts 'Введите 4, если хотите создать вагон'
     n = gets.chomp.to_i
     case n
     when 1
       create_route
     when 2
       create_station
-    when 3
-      create_train
     else
-      create_wagon
+      create_train
     end
   end
 
   def create_route
-    puts 'Введите первую станцию маршрута'
-    name1 = gets.chomp
-    @s1 = Station.new(name1)
-    puts 'Введите последнюю станцию маршрута'
-    name2 = gets.chomp
-    @s2 = Station.new(name2)
-    @r = Route.new(@s1, @s2)
+    puts 'Выберите первую станцию маршрута'
+    s1 = choose_station(@s)
+    puts 'Выберите последнюю станцию маршрута'
+    s2 = choose_station(@s)
+    @r << Route.new(@s[s1], @s[s2])
   end
 
   def create_station
     puts 'Введите название станции'
-    name1 = gets.chomp
-    @s1 = Station.new(name1)
+    name = gets.chomp
+    @s << Station.new(name)
   end
 
   def create_train
@@ -68,18 +69,15 @@ class RailRoad
     n = gets.chomp.to_i
     puts 'Введите номер поезда'
     number = gets.chomp.to_i
-    return @t = CargoTrain.new(number) if n == 1
+    return @t << CargoTrain.new(number) if n == 1
 
-    @t = PassengerTrain.new(number)
+    @t << PassengerTrain.new(number)
   end
 
-  def create_wagon
-    puts 'Введите 1, если хотите создать грузовой вагон'
-    puts 'Введите 2, если хотите создать пассажирский вагон'
-    n = gets.chomp.to_i
-    return @w = CargoWagon.new if n == 1
+  def create_wagon(type)
+    return CargoWagon.new if type == 'cargo'
 
-    @w = PassengerWagon.new
+    PassengerWagon.new
   end
 
   def operation
@@ -92,27 +90,38 @@ class RailRoad
     n = gets.chomp.to_i
     case n
     when 1
-      @r.add_station(@s1)
+      r_n = choose_route
+      s_n = choose_station(@s)
+      @r[r_n].add_station(@s[s_n])
     when 2
-      @r.del_station(@s1)
+      r_n = choose_route
+      s_n = choose_station(@r[r_n].stations)
+      @r[r_n].del_station(@s[s_n])
     when 3
-      @t.add_route(@r)
+      t_n = choose_train
+      r_n = choose_route
+      @t[t_n].add_route(@r[r_n])
     when 4
-      @t.add_wagon(@w)
+      t_n = choose_train
+      w = create_wagon(@t[t_n].type)
+      @t[t_n].add_wagon(w)
     when 5
-      @t.del_wagon(@w)
+      t_n = choose_train
+      w_n = choose_wagon(@t[t_n])
+      @t[t_n].del_wagon(@t[t_n].wagons[w_n])
     when 6
       move
     end
   end
 
   def move
+    t_n = choose_train
     puts 'Введите 1, если хотите переместить поезд вперед'
     puts 'Введите 2, если хотите переместить поезд назад'
     n = gets.chomp.to_i
-    return @t.forward if n == 1
+    return @t[t_n].forward if n == 1
 
-    @t.backward
+    @t[t_n].backward
   end
 
   def data
@@ -120,16 +129,44 @@ class RailRoad
     puts 'Введите 2, если хотите просмотреть список поездов на станции'
     n = gets.chomp.to_i
     if n == 1
-      puts @r.first_stat.name
-      @r.stations.each { |station| puts station.name }
-      puts @r.last_stat.name
+      r_n = choose_route
+      puts @r[r_n].first_stat.name
+      @r[r_n].stations.each { |station| puts station.name }
+      puts @r[r_n].last_stat.name
     else
-      @s1.trains.each { |train| puts train.number }
+      s_n = choose_station(@s)
+      return puts 'На выбранной станции поездов нет' if @s[s_n].trains.empty?
+
+      @s[s_n].trains.each { |train| puts train.number }
     end
+  end
+
+  def choose_route
+    @r.each_with_index { |route, i| puts "#{i}. #{route.first_stat.name} -> #{route.last_stat.name}" }
+    puts 'Введите номер маршрута'
+    gets.chomp.to_i
+  end
+
+  def choose_station(stations)
+    stations.each_with_index { |station, i| puts "#{i}. #{station.name}" }
+    puts 'Введите номер станции'
+    gets.chomp.to_i
+  end
+
+  def choose_train
+    @t.each_with_index { |train, i| puts "#{i}. #{train.number}" }
+    puts 'Введите номер поезда'
+    gets.chomp.to_i
+  end
+
+  def choose_wagon(train)
+    train.wagons.each_with_index { |wagon, i| puts "#{i}. #{wagon}" }
+    puts 'Введите номер вагона'
+    gets.chomp.to_i
   end
 
   private
 
   # Внутренние методы класса
-  attr_writer :r, :s1, :s2, :t, :w
+  attr_writer :r, :s, :t
 end
