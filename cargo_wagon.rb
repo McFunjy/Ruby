@@ -1,4 +1,7 @@
+require_relative 'company'
+
 class CargoWagon
+  include Company
   # Клиентский код может читать тип вагона
   attr_reader :type
 

@@ -1,4 +1,7 @@
+require_relative 'instance_counter'
+
 class Route
+  include InstanceCounter
   # Клиентский код может читать список станций и первую и последнюю станции
   attr_reader :first_stat, :last_stat, :stations
 
@@ -7,6 +10,7 @@ class Route
     @first_stat = first_stat
     @last_stat = last_stat
     @stations = []
+    register_instance
   end
 
   # Добавление станции входит в интерфейс

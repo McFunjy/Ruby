@@ -1,12 +1,27 @@
+require_relative 'company'
+require_relative 'instance_counter'
+
 class Train
+  include Company
+  include InstanceCounter
   # Клиентский код может просматривать номер, скорость и список вагонов поезда
   attr_reader :number, :speed, :wagons
+
+  def self.all
+    @@all ||= []
+  end
+
+  def self.find(number)
+    all.find { |train| return train if train.number == number }
+  end
 
   # Клиентский код может создавать опезда
   def initialize(number)
     @number = number
     @speed = 0
     @wagons = []
+    self.class.all << self
+    register_instance
   end
 
   # Клиентский код может останавливать поезд

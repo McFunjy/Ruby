@@ -1,11 +1,20 @@
+require_relative 'instance_counter'
+
 class Station
+  include InstanceCounter
   # Клиентский код может просматривать список поездов на станции и названия станций
   attr_reader :name, :trains
+
+  def self.all
+    @@all ||= []
+  end
 
   # Клиентский код может создавать станции
   def initialize(name)
     @name = name
     @trains = []
+    self.class.all << self
+    register_instance
   end
 
   # Клиентский код может просматривать список грузовых поездов
