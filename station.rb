@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'instance_counter'
 require_relative 'validate'
 
@@ -39,6 +41,10 @@ class Station
   # Метод используется другим классом
   def send_train(train)
     @trains.delete(train)
+  end
+
+  def each_train(&block)
+    @trains.each(&block)
   end
 
   private
