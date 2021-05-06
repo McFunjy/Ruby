@@ -67,11 +67,18 @@ class RailRoad
     puts 'Введите 1, если хотите создать грузовой поезд'
     puts 'Введите 2, если хотите создать пассажирский поезд'
     n = gets.chomp.to_i
-    puts 'Введите номер поезда'
-    number = gets.chomp.to_i
-    return @t << CargoTrain.new(number) if n == 1
+    begin
+      puts 'Введите номер поезда'
+      number = gets.chomp
+      return @t << CargoTrain.new(number) if n == 1
 
-    @t << PassengerTrain.new(number)
+      @t << PassengerTrain.new(number)
+    rescue StandardError => e
+      puts e.message
+      puts 'Попробуйте еще раз'
+      retry
+      puts 'Поезд успешно создан'
+    end
   end
 
   def create_wagon(type)
