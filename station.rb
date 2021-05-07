@@ -44,7 +44,7 @@ class Station
   end
 
   def each_train(&block)
-    @trains.each(&block)
+    @trains.each { |train| block.call(train) }
   end
 
   private

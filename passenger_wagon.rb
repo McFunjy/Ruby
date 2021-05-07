@@ -23,7 +23,7 @@ class PassengerWagon
     @occupied_seats
   end
 
-  def free_seats
+  def available
     @total_seats - @occupied_seats
   end
 

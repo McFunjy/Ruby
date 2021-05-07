@@ -166,20 +166,13 @@ class RailRoad
       s_n = choose_station(@s)
       return puts 'На выбранной станции поездов нет' if @s[s_n].trains.empty?
 
-      puts 'Номер поезда   Тип      Кол-во вагонов'
-      @s[s_n].each_train { |train| puts "   #{train.number}     #{train.type}         #{train.wagons.count}" }
+      puts 'Номер поезда     Тип        Кол-во вагонов'
+      @s[s_n].each_train { |train| puts "   #{train.number}      #{train.type}         #{train.wagons.count}" }
     else
       t_n = choose_train
-      if @t[t_n].type == 'cargo'
-        puts 'Номер вагона    Тип     Кол-во свободного/занятого объема'
-        @t[t_n].each_waogn do |wagon|
-          puts "   #{wagon.number}          #{wagon.type}          #{wagon.available}/#{wagon.occupied}"
-        end
-      else
-        puts 'Номер вагона      Тип       Кол-во свободных/занятых мест'
-        @t[t_n].each_waogn do |wagon|
-          puts "   #{wagon.number}           #{wagon.type}            #{wagon.free_seats}/#{wagon.occupied}"
-        end
+      puts 'Номер вагона        Тип          Кол-во свободного/занятого объема(мест)'
+      @t[t_n].each_wagon do |wagon|
+        puts "   #{wagon.number}              #{wagon.type}           #{wagon.available}/#{wagon.occupied}"
       end
     end
   end

@@ -101,8 +101,8 @@ class Train
     @route.stations[@route.stations.index(current_stat) + 1]
   end
 
-  def each_waogn(&block)
-    @wagons.each(&block)
+  def each_wagon(&block)
+    @wagons.each { |wagon| block.call(wagon) }
   end
 
   protected
