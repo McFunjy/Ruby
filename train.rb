@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'company'
 require_relative 'instance_counter'
 require_relative 'validate'
@@ -9,7 +11,7 @@ class Train
   # Клиентский код может просматривать номер, скорость и список вагонов поезда
   attr_reader :number, :speed, :wagons
 
-  NUMBER_FORMAT = /^[а-я\w\d]{3}-?[а-я\w\d]{2}$/i
+  NUMBER_FORMAT = /^[а-я\w\d]{3}-?[а-я\w\d]{2}$/i.freeze
 
   def self.all
     @@all ||= []
@@ -97,6 +99,10 @@ class Train
     return @route.stations.first if current_stat == @route.first_stat
 
     @route.stations[@route.stations.index(current_stat) + 1]
+  end
+
+  def each_wagon(&block)
+    @wagons.each { |wagon| block.call(wagon) }
   end
 
   protected

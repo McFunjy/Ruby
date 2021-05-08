@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'cargo_train'
 require_relative 'cargo_wagon'
 require_relative 'passenger_train'
@@ -82,9 +84,15 @@ class RailRoad
   end
 
   def create_wagon(type)
-    return CargoWagon.new if type == 'cargo'
-
-    PassengerWagon.new
+    if type == 'cargo'
+      puts 'Введите объем вагона'
+      volume = gets.chomp.to_i
+      CargoWagon.new(volume)
+    else
+      puts 'Введите кол-во мест в вагоне'
+      seats = gets.chomp.to_i
+      PassengerWagon.new(seats)
+    end
   end
 
   def operation
@@ -94,6 +102,7 @@ class RailRoad
     puts 'Введите 4, если хотите добавить вагон к поезду'
     puts 'Введите 5, если хотите отцепить вагон от поезда'
     puts 'Введите 6, если хотите переместить поезд'
+    puts 'Введите 7, если хотите занять место/объем в вагоне'
     n = gets.chomp.to_i
     case n
     when 1
@@ -118,6 +127,17 @@ class RailRoad
       @t[t_n].del_wagon(@t[t_n].wagons[w_n])
     when 6
       move
+    when 7
+      t_n = choose_train
+      w_n = choose_wagon(@t[t_n])
+      if @t[t_n].type == 'cargo'
+        puts 'Введите объем, который нужно занять'
+        volume = gets.chomp.to_i
+        @t[t_n].wagons[w_n].load(volume)
+      else
+        @t[t_n].wagons[w_n].take_seat
+        puts 'Место успешно занято'
+      end
     end
   end
 
@@ -134,17 +154,26 @@ class RailRoad
   def data
     puts 'Введите 1, если хотите просмотреть список станций маршрута'
     puts 'Введите 2, если хотите просмотреть список поездов на станции'
+    puts 'Введите 3, если хотите просмотреть список вагонов поезда'
     n = gets.chomp.to_i
-    if n == 1
+    case n
+    when 1
       r_n = choose_route
       puts @r[r_n].first_stat.name
       @r[r_n].stations.each { |station| puts station.name }
       puts @r[r_n].last_stat.name
-    else
+    when 2
       s_n = choose_station(@s)
       return puts 'На выбранной станции поездов нет' if @s[s_n].trains.empty?
 
-      @s[s_n].trains.each { |train| puts train.number }
+      puts 'Номер поезда     Тип        Кол-во вагонов'
+      @s[s_n].each_train { |train| puts "   #{train.number}      #{train.type}         #{train.wagons.count}" }
+    else
+      t_n = choose_train
+      puts 'Номер вагона        Тип          Кол-во свободного/занятого объема(мест)'
+      @t[t_n].each_wagon do |wagon|
+        puts "   #{wagon.number}              #{wagon.type}           #{wagon.available}/#{wagon.occupied}"
+      end
     end
   end
 
@@ -167,7 +196,7 @@ class RailRoad
   end
 
   def choose_wagon(train)
-    train.wagons.each_with_index { |wagon, i| puts "#{i}. #{wagon}" }
+    train.wagons.each_with_index { |wagon, i| puts "#{i}. #{wagon.number}" }
     puts 'Введите номер вагона'
     gets.chomp.to_i
   end
