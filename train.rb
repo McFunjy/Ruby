@@ -2,16 +2,25 @@
 
 require_relative 'company'
 require_relative 'instance_counter'
-require_relative 'validate'
+require_relative 'validation'
+require_relative 'accessors'
 
 class Train
   include Company
   include InstanceCounter
-  include Validate
+  include Validation
+  include Accessors
   # Клиентский код может просматривать номер, скорость и список вагонов поезда
-  attr_reader :number, :speed, :wagons
+  attr_reader :speed
+
+  attr_accessor_with_history :wagons
+  strong_attr_accessor :number, String
 
   NUMBER_FORMAT = /^[а-я\w\d]{3}-?[а-я\w\d]{2}$/i.freeze
+
+  validate :number, :type, String
+  validate :number, :presence
+  validate :name, :format, NUMBER_FORMAT
 
   def self.all
     @@all ||= []
@@ -107,12 +116,6 @@ class Train
 
   protected
 
-  def validate!
-    raise 'У поезда должен быть номер' if @number.nil?
-    raise 'Номер поезда должен быть строкой' unless @number.is_a? String
-    raise 'Неверный формат номера' if @number !~ NUMBER_FORMAT
-  end
-
   # Клиентский код не может измеять скорость и список вагонов внутренним методом
-  attr_writer :speed, :wagons
+  attr_writer :speed
 end
